@@ -12,7 +12,7 @@ const client = new QueryClient();
 const App: React.FC<object> = () => {
   return (
     <QueryClientProvider client={client}>
-      <MantineProvider theme={theme}>
+      <MantineProvider defaultColorScheme="dark" theme={theme}>
         <WhereBus />
       </MantineProvider>
     </QueryClientProvider>

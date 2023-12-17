@@ -1,8 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { GetBusArrivalRequest } from "../typings";
-import mock from "./mock_data.json";
-import { useAtom } from "jotai";
-import { getBusArrivalRequestAtom } from "../atoms";
+import {
+  BusStop,
+  BusStopCode,
+  GetBusArrivalRequest,
+  GetBusArrivalResponse,
+  NextBus,
+} from "../typings";
+import BusArrivalMock from "./mocks/BusArrival.json";
+import BusStopsMock from "./mocks/BusStops.json";
 
 // so that we can dev loading page with mocked data
 const delay = (milliseconds: number) =>
@@ -13,17 +18,69 @@ const delay = (milliseconds: number) =>
   });
 
 const QUERY_KEYS = {
-  GET_BUS_ARRIVAL: (filter: GetBusArrivalRequest) => ["bus", filter],
+  GET_BUS_ARRIVAL: (filter: GetBusArrivalRequest) => ["arrival", filter],
+  GET_BUS_STOPS: ["stops"],
 };
 
-export const useGetBusArrival = () => {
-  const [filter] = useAtom(getBusArrivalRequestAtom);
+export const useGetBusArrival = (params: GetBusArrivalRequest) => {
+  const { data: metadata = new Map<BusStopCode, BusStop>(), isSuccess } =
+    useGetBusStopsMetadataMapping();
+
   return useQuery({
-    queryKey: QUERY_KEYS.GET_BUS_ARRIVAL(filter),
+    queryKey: QUERY_KEYS.GET_BUS_ARRIVAL(params),
     queryFn: async () => {
-      // mock for now
+      // return client.GetBusArrival(params);
       await delay(1000);
-      return mock;
+      return BusArrivalMock as GetBusArrivalResponse;
+    },
+    enabled: isSuccess,
+    refetchInterval: 30000, // refetch every 30s
+    select: (data) => {
+      const Services = data.Services.map((s) => {
+        const nextBuses = [s.NextBus, s.NextBus2, s.NextBus3].filter(
+          Boolean
+        ) as NextBus[];
+        s.NextBuses = nextBuses;
+
+        if (nextBuses.length > 0) {
+          // assuming all the same BusCodes goes to the same destination
+          const destinationBusStop = nextBuses[0];
+          s.destinationMetadata = metadata.get(
+            destinationBusStop.DestinationCode
+          );
+        }
+        return s;
+      });
+      Services.sort(({ ServiceNo: a }, { ServiceNo: b }) =>
+        String(a).localeCompare(String(b), undefined, { numeric: true })
+      );
+      return {
+        ...data,
+        SourceMetaData: metadata.get(data.BusStopCode),
+        NextBuses: data.Services.map(
+          ({ NextBus, NextBus2, NextBus3 }) =>
+            [NextBus, NextBus2, NextBus3].filter(Boolean) as NextBus[]
+        ),
+        Services,
+      };
+    },
+  });
+};
+
+export const useGetBusStopsMetadataMapping = () => {
+  return useQuery({
+    queryKey: QUERY_KEYS.GET_BUS_STOPS,
+    queryFn: async () => {
+      // return client.GetBusStops();
+      await delay(1000);
+      return BusStopsMock;
+    },
+    select: ({ value }) => {
+      const map = new Map<BusStopCode, BusStop>();
+      value.forEach((v) => {
+        map.set(v.BusStopCode, v);
+      });
+      return map;
     },
   });
 };

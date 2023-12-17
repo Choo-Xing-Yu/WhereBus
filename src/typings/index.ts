@@ -1,8 +1,12 @@
 export type BusStopCode = number | string;
 
+export type ServiceNumber = string | number;
+
+export type Coordinate = string | number;
+
 export interface GetBusArrivalRequest {
   BusStopCode: BusStopCode;
-  ServiceNo?: number;
+  ServiceNo?: ServiceNumber;
 }
 
 export enum BusType {
@@ -25,8 +29,8 @@ export interface NextBus {
   OriginCode: BusStopCode;
   DestinationCode: BusStopCode;
   EstimatedArrival: string; // in GMT+8 UTC standard, EG: 2017-04-29T07:20:24+08:00
-  Latitude: string;
-  Longitude: string;
+  Latitude: Coordinate;
+  Longitude: Coordinate;
   VisitNumber: string;
   Load: BusLoad;
   Feature?: BusFeature;
@@ -41,14 +45,27 @@ export enum Operator {
 }
 
 export interface Service {
-  ServiceNo: string;
+  ServiceNo: ServiceNumber;
   Operator: Operator;
   NextBus?: NextBus;
   NextBus2?: NextBus;
   NextBus3?: NextBus;
+  destinationMetadata?: BusStop;
+  NextBuses?: NextBus[]; // defined NextBus, NextBus2 and NextBus3 collected in an array
 }
 
 export interface GetBusArrivalResponse {
-  BusStopCode: number;
+  BusStopCode: BusStopCode;
   Services: Service[];
+}
+
+export interface BusStop {
+  BusStopCode: BusStopCode;
+  RoadName: string;
+  Description: string;
+  Latitude: Coordinate;
+  Longitude: Coordinate;
+}
+export interface GetBusStopsResponse {
+  value: BusStop[];
 }
