@@ -69,3 +69,8 @@ export interface BusStop {
 export interface GetBusStopsResponse {
   value: BusStop[];
 }
+
+export interface GeoLocation {
+  latitude: number;
+  longitude: number;
+}

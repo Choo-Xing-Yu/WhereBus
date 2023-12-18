@@ -8,6 +8,9 @@ import {
 } from "../typings";
 import BusArrivalMock from "./mocks/BusArrival.json";
 import BusStopsMock from "./mocks/BusStops.json";
+import { useAtom } from "jotai";
+import { currentLocationAtom } from "../atoms";
+import { getDistance } from "geolib";
 
 // so that we can dev loading page with mocked data
 const delay = (milliseconds: number) =>
@@ -81,6 +84,33 @@ export const useGetBusStopsMetadataMapping = () => {
         map.set(v.BusStopCode, v);
       });
       return map;
+    },
+  });
+};
+
+export const useGetNearestBusStops = () => {
+  const [{ latitude, longitude }] = useAtom(currentLocationAtom);
+
+  return useQuery({
+    queryKey: QUERY_KEYS.GET_BUS_STOPS,
+    queryFn: async () => {
+      // return client.GetBusStops();
+      await delay(1000);
+      return BusStopsMock;
+    },
+    select: ({ value }) => {
+      const busStopsWithDistanceAway = value.map((v) => ({
+        ...v,
+        distanceAway: getDistance(
+          { latitude, longitude },
+          { latitude: v.Latitude, longitude: v.Longitude }
+        ),
+      }));
+
+      // sort distanceAway in descending order
+      busStopsWithDistanceAway.sort((x, y) => x.distanceAway - y.distanceAway);
+
+      return busStopsWithDistanceAway;
     },
   });
 };
