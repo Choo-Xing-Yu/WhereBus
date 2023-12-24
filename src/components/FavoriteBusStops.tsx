@@ -1,12 +1,10 @@
 import { Text } from "@mantine/core";
-import { useAtom } from "jotai";
 import React from "react";
-import { selectedBusStopsAtom } from "../atoms";
+import { useGetFavoriteBusStops } from "../api";
 import { BusStopCard } from "./BusStopCard";
-import { BusStopCode } from "../typings";
 
 export const FavoriteBusStops: React.FC<object> = () => {
-  const [busStops] = useAtom<BusStopCode[]>(selectedBusStopsAtom);
+  const { data: busStops = [] } = useGetFavoriteBusStops();
   return (
     <>
       <div className="p-4">
