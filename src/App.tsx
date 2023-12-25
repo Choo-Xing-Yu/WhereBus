@@ -5,9 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
   /** Put your mantine theme override here */
+  fontFamily: "Inter, sans-serif",
 });
 
-const client = new QueryClient();
+export const client = new QueryClient();
 
 const App: React.FC<object> = () => {
   return (

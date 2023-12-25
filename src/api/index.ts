@@ -1,4 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getDistance } from "geolib";
+import { useAtom } from "jotai";
+import { client } from "../App";
+import { currentLocationAtom, searchedBusStopAtom } from "../atoms";
 import {
   BusStop,
   BusStopCode,
@@ -6,6 +10,10 @@ import {
   GetBusArrivalResponse,
   NextBus,
 } from "../typings";
+import {
+  getLocalStorageFavoriteBusStops,
+  persistLocalStorageFavoriteBusStops,
+} from "../utils";
 import BusArrivalMock from "./mocks/BusArrival.json";
 import BusStopsMock from "./mocks/BusStops.json";
 
@@ -20,6 +28,8 @@ const delay = (milliseconds: number) =>
 const QUERY_KEYS = {
   GET_BUS_ARRIVAL: (filter: GetBusArrivalRequest) => ["arrival", filter],
   GET_BUS_STOPS: ["stops"],
+  FAVORITE_BUS_STOPS: ["favorite_stops"],
+  SEARCHED_BUS_STOPS: (search: string) => ["favorite_stops", search],
 };
 
 export const useGetBusArrival = (params: GetBusArrivalRequest) => {
@@ -81,6 +91,99 @@ export const useGetBusStopsMetadataMapping = () => {
         map.set(v.BusStopCode, v);
       });
       return map;
+    },
+  });
+};
+
+export const useGetNearestBusStops = () => {
+  const [{ latitude, longitude }] = useAtom(currentLocationAtom);
+
+  return useQuery({
+    queryKey: QUERY_KEYS.GET_BUS_STOPS,
+    queryFn: async () => {
+      // return client.GetBusStops();
+      await delay(1000);
+      return BusStopsMock;
+    },
+    select: ({ value }) => {
+      const busStopsWithDistanceAway = value.map((v) => ({
+        ...v,
+        distanceAway: getDistance(
+          { latitude, longitude },
+          { latitude: v.Latitude, longitude: v.Longitude }
+        ),
+      }));
+
+      // sort distanceAway in descending order
+      busStopsWithDistanceAway.sort((x, y) => x.distanceAway - y.distanceAway);
+
+      return busStopsWithDistanceAway;
+    },
+  });
+};
+
+export const useGetSearchedNearestBusStops = () => {
+  const { data = [], isSuccess } = useGetNearestBusStops();
+  const [search] = useAtom(searchedBusStopAtom);
+  return useQuery({
+    queryKey: QUERY_KEYS.SEARCHED_BUS_STOPS(search),
+    enabled: isSuccess,
+    queryFn: () => {
+      if (search.length === 0) return [];
+
+      return data.filter(
+        ({ BusStopCode, RoadName, Description }) =>
+          [BusStopCode, RoadName, Description]
+            .map((s) => String(s).toLowerCase())
+            .filter((s) => s.includes(search.toLowerCase())).length > 0
+      );
+    },
+  });
+};
+
+export const useGetFavoriteBusStops = () => {
+  return useQuery({
+    queryKey: QUERY_KEYS.FAVORITE_BUS_STOPS,
+    queryFn: () => getLocalStorageFavoriteBusStops(),
+  });
+};
+
+export const useSetFavoriteBusStops = () => {
+  const { data: favoriteBusStops = [] } = useGetFavoriteBusStops();
+
+  return useMutation({
+    mutationFn: async ({
+      busStopCode,
+      merge = true,
+    }: {
+      busStopCode: BusStopCode;
+      merge?: boolean;
+    }) => {
+      const newBusStops: BusStopCode[] = merge
+        ? [...favoriteBusStops, busStopCode]
+        : [busStopCode];
+
+      return persistLocalStorageFavoriteBusStops(newBusStops);
+    },
+    onSuccess: (data) => {
+      client.setQueryData(QUERY_KEYS.FAVORITE_BUS_STOPS, data);
+    },
+  });
+};
+
+export const useRemoveFromFavoriteBusStops = () => {
+  const { data: favoriteBusStops = [] } = useGetFavoriteBusStops();
+
+  return useMutation({
+    mutationFn: async ({ busStopCode }: { busStopCode: BusStopCode }) => {
+      const newBusStops: BusStopCode[] = [...favoriteBusStops].filter(
+        (f) => f !== busStopCode
+      );
+
+      return persistLocalStorageFavoriteBusStops(newBusStops);
+    },
+    onSuccess: (data) => {
+      client.setQueryData(QUERY_KEYS.FAVORITE_BUS_STOPS, data);
     },
   });
 };
