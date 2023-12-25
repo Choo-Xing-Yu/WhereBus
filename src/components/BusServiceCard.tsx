@@ -87,7 +87,7 @@ export const BusServiceCard: React.FC<BusServiceCardProps> = ({ service }) => {
           <Text size="xl" fw={700}>
             {serviceNumber}
           </Text>
-          <Text>{description}</Text>
+          <Text size="sm">{description}</Text>
         </Group>
         <Group wrap="nowrap" justify="space-between" align="center">
           {RHS}

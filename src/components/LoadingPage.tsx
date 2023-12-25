@@ -7,7 +7,7 @@ export const LoadingPage: React.FC<object> = () => {
       className="flex flex-1 items-center justify-center"
       style={{ height: "100vh" }}
     >
-      <Loader color="blue" />
+      <Loader color="gray" />
     </Container>
   );
 };

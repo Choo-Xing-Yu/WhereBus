@@ -4,3 +4,8 @@ export const JURONG_WEST_AVE_1_BLK_551_BUS_STOP_CODE = 28541;
 
 export const FAVORITE_BUS_STOP_LOCAL_STORAGE_KEY =
   "FAVORITE_BUS_STOP_LOCAL_STORAGE_KEY";
+
+export enum TabName {
+  Favorites = "FAVORITES",
+  Nearest = "NEAREST",
+}

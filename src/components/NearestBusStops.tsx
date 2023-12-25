@@ -48,7 +48,7 @@ export const NearestBusStops: React.FC<object> = () => {
       <SearchBar />
       {isLoading ? (
         <Center>
-          <Loader />
+          <Loader color="gray" />
         </Center>
       ) : (
         renderedList.map((busStop, i) => (
