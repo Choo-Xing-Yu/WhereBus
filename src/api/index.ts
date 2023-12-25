@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getDistance } from "geolib";
 import { useAtom } from "jotai";
 import { client } from "../App";
-import { currentLocationAtom } from "../atoms";
+import { currentLocationAtom, searchedBusStopAtom } from "../atoms";
 import {
   BusStop,
   BusStopCode,
@@ -29,6 +29,7 @@ const QUERY_KEYS = {
   GET_BUS_ARRIVAL: (filter: GetBusArrivalRequest) => ["arrival", filter],
   GET_BUS_STOPS: ["stops"],
   FAVORITE_BUS_STOPS: ["favorite_stops"],
+  SEARCHED_BUS_STOPS: (search: string) => ["favorite_stops", search],
 };
 
 export const useGetBusArrival = (params: GetBusArrivalRequest) => {
@@ -117,6 +118,25 @@ export const useGetNearestBusStops = () => {
       busStopsWithDistanceAway.sort((x, y) => x.distanceAway - y.distanceAway);
 
       return busStopsWithDistanceAway;
+    },
+  });
+};
+
+export const useGetSearchedNearestBusStops = () => {
+  const { data = [], isSuccess } = useGetNearestBusStops();
+  const [search] = useAtom(searchedBusStopAtom);
+  return useQuery({
+    queryKey: QUERY_KEYS.SEARCHED_BUS_STOPS(search),
+    enabled: isSuccess,
+    queryFn: () => {
+      if (search.length === 0) return [];
+
+      return data.filter(
+        ({ BusStopCode, RoadName, Description }) =>
+          [BusStopCode, RoadName, Description]
+            .map((s) => String(s).toLowerCase())
+            .filter((s) => s.includes(search.toLowerCase())).length > 0
+      );
     },
   });
 };

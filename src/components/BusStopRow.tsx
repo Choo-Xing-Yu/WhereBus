@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Group, Text } from "@mantine/core";
-import { Heart } from "tabler-icons-react";
+import { IconHeart, IconHeartFilled } from "@tabler/icons-react";
 import { useRemoveFromFavoriteBusStops, useSetFavoriteBusStops } from "../api";
 import { BusStop } from "../typings";
 export interface BusStopRowProps {
@@ -19,7 +19,8 @@ export const BusStopRow: React.FC<BusStopRowProps> = ({
     <Card>
       <Group gap={"sm"}>
         <ActionIcon
-          variant="default"
+          variant="transparent"
+          color="yellow"
           onClick={() => {
             const payload = { busStopCode: BusStopCode };
             if (isFavorite) {
@@ -29,7 +30,7 @@ export const BusStopRow: React.FC<BusStopRowProps> = ({
             mutateSet(payload);
           }}
         >
-          <Heart color={isFavorite ? "yellow" : "gray"} />
+          {isFavorite ? <IconHeartFilled /> : <IconHeart />}
         </ActionIcon>
         <Text>{[BusStopCode, RoadName, Description].join(" | ")}</Text>
       </Group>
