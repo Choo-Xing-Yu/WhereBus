@@ -1,7 +1,7 @@
 import { FAVORITE_BUS_STOP_LOCAL_STORAGE_KEY } from "../constants";
 import { BusStopCode } from "../typings";
 
-export const hexToRgba = (hex: string, alpha: number = 1) => {
+export const hexToRgba = (hex: string = '', alpha: number = 1) => {
   hex = hex.replace(/^#/, ""); // Remove the hash if it exists
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
