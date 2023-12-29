@@ -34,7 +34,7 @@ export const useGetBusArrival = (params: GetBusArrivalRequest) => {
     select: (data) => {
       const Services = data.Services.map((s) => {
         const nextBuses = [s.NextBus, s.NextBus2, s.NextBus3].filter(
-          Boolean
+          (nextBus) => Boolean(nextBus?.EstimatedArrival)
         ) as NextBus[];
         s.NextBuses = nextBuses;
 
