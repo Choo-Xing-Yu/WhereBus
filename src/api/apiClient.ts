@@ -5,7 +5,7 @@ import {
   GetBusStopsResponse,
 } from "../typings";
 
-const AccountKey = "STUB";
+const AccountKey = import.meta.env.VITE_API_KEY ?? "";
 
 class Client {
   async GetBusArrival(params: GetBusArrivalRequest) {
@@ -30,6 +30,6 @@ class Client {
   }
 }
 
-const client = new Client();
+const apiClient = new Client();
 
-export default client;
+export default apiClient;

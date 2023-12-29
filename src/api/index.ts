@@ -7,23 +7,13 @@ import {
   BusStop,
   BusStopCode,
   GetBusArrivalRequest,
-  GetBusArrivalResponse,
   NextBus,
 } from "../typings";
 import {
   getLocalStorageFavoriteBusStops,
   persistLocalStorageFavoriteBusStops,
 } from "../utils";
-import BusArrivalMock from "./mocks/BusArrival.json";
-import BusStopsMock from "./mocks/BusStops.json";
-
-// so that we can dev loading page with mocked data
-const delay = (milliseconds: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, milliseconds);
-  });
+import apiClient from "./apiClient";
 
 const QUERY_KEYS = {
   GET_BUS_ARRIVAL: (filter: GetBusArrivalRequest) => ["arrival", filter],
@@ -39,9 +29,7 @@ export const useGetBusArrival = (params: GetBusArrivalRequest) => {
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_ARRIVAL(params),
     queryFn: async () => {
-      // return client.GetBusArrival(params);
-      await delay(1000);
-      return BusArrivalMock as GetBusArrivalResponse;
+      return apiClient.GetBusArrival(params);
     },
     enabled: isSuccess,
     refetchInterval: 30000, // refetch every 30s
@@ -81,9 +69,7 @@ export const useGetBusStopsMetadataMapping = () => {
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_STOPS,
     queryFn: async () => {
-      // return client.GetBusStops();
-      await delay(1000);
-      return BusStopsMock;
+      return apiClient.GetBusStops();
     },
     select: ({ value }) => {
       const map = new Map<BusStopCode, BusStop>();
@@ -101,9 +87,7 @@ export const useGetNearestBusStops = () => {
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_STOPS,
     queryFn: async () => {
-      // return client.GetBusStops();
-      await delay(1000);
-      return BusStopsMock;
+      return apiClient.GetBusStops();
     },
     select: ({ value }) => {
       const busStopsWithDistanceAway = value.map((v) => ({
