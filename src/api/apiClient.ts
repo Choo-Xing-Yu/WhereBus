@@ -8,25 +8,29 @@ import {
 const AccountKey = import.meta.env.VITE_API_KEY ?? "";
 
 class Client {
-  async GetBusArrival(params: GetBusArrivalRequest) {
-    const URL = "https://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2";
-    return await axios.get<GetBusArrivalRequest, GetBusArrivalResponse>(URL, {
+  async GetBusArrival(
+    params: GetBusArrivalRequest
+  ): Promise<GetBusArrivalResponse> {
+    const URL = "/api/BusArrivalv2";
+    const res = await axios.get(URL, {
       headers: {
         Accept: "application/json",
         AccountKey,
       },
       params,
     });
+    return res.data;
   }
 
-  async GetBusStops() {
-    const URL = "https://datamall2.mytransport.sg/ltaodataservice/BusStops";
-    return await axios.get<void, GetBusStopsResponse>(URL, {
+  async GetBusStops(): Promise<GetBusStopsResponse> {
+    const URL = "/api/BusStops";
+    const res = await axios.get(URL, {
       headers: {
         Accept: "application/json",
         AccountKey,
       },
     });
+    return res.data;
   }
 }
 

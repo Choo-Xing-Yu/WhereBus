@@ -28,9 +28,7 @@ export const useGetBusArrival = (params: GetBusArrivalRequest) => {
 
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_ARRIVAL(params),
-    queryFn: async () => {
-      return apiClient.GetBusArrival(params);
-    },
+    queryFn: async () => apiClient.GetBusArrival(params),
     enabled: isSuccess,
     refetchInterval: 30000, // refetch every 30s
     select: (data) => {
@@ -68,9 +66,7 @@ export const useGetBusArrival = (params: GetBusArrivalRequest) => {
 export const useGetBusStopsMetadataMapping = () => {
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_STOPS,
-    queryFn: async () => {
-      return apiClient.GetBusStops();
-    },
+    queryFn: async () => apiClient.GetBusStops(),
     select: ({ value }) => {
       const map = new Map<BusStopCode, BusStop>();
       value.forEach((v) => {
@@ -86,9 +82,7 @@ export const useGetNearestBusStops = () => {
 
   return useQuery({
     queryKey: QUERY_KEYS.GET_BUS_STOPS,
-    queryFn: async () => {
-      return apiClient.GetBusStops();
-    },
+    queryFn: async () => apiClient.GetBusStops(),
     select: ({ value }) => {
       const busStopsWithDistanceAway = value.map((v) => ({
         ...v,
