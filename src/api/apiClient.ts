@@ -31,7 +31,7 @@ class Client {
     // and each response gives at most 500 records
     // but there's a QPS limit so we do 4 parallel requests first
     // then do the rest sequentially
-    const skips: number[] = [500, 1000, 1500, 2000];
+    const skips: number[] = [0, 500, 1000, 1500];
 
     // so we want to collect all bus stops in 1 go
     const responses = await Promise.all(
