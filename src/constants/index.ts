@@ -9,3 +9,5 @@ export enum TabName {
   Favorites = "FAVORITES",
   Nearest = "NEAREST",
 }
+
+export const GET_BUS_STOPS_PAGE_SIZE = 500;

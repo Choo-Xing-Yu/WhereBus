@@ -58,8 +58,8 @@ export const NearestBusStops: React.FC<object> = () => {
 
   const isLoading = isNearestBusStopLoading || isSearchLoading;
 
-  const renderedList = search.length > 0 ? searchedBusStops : nearestBusStops;
-
+  const list = search.length > 0 ? searchedBusStops : nearestBusStops;
+  const renderedList = list.slice(0, 10); // only render atmost 10
   return (
     <div className="w-full flex flex-col gap-y-4 p-4">
       <Text size="xl" fw={700}>
