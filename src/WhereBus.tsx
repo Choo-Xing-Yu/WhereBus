@@ -34,7 +34,7 @@ export const WhereBus: React.FC<object> = () => {
   if (isError) return <ErrorPage />;
 
   return (
-    <>
+    <div className="pb-16">
       <Tabs color="yellow" value={activeTab} onChange={setActiveTab}>
         <Tabs.List>
           <Tabs.Tab
@@ -58,6 +58,6 @@ export const WhereBus: React.FC<object> = () => {
           <NearestBusStops />
         </Tabs.Panel>
       </Tabs>
-    </>
+    </div>
   );
 };
